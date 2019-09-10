@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.owulanii.androidlogin">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-sdk tools:overrideLibrary="com.google.firebase.messaging, com.google.android.gms.location, com.google.firebase.iid, com.google.firebase, com.google.firebase.iid.internal, com.google.android.gms.base, com.google.android.gms.tasks, com.google.firebase.analytics.connector, com.google.android.gms.places_placereport,com.google.android.gms.stats
+    com.google.android.gms.common, com.google.android.gms.stats, com.google.android.gms.common, android.support.v4, android.support.mediacompat, android.support.fragment, android.support.coreutils,
+    android.support.coreui, android.support.compat, android.arch.lifecycle"/>
 
     <application
         android:name=".AndroidLoginController"
@@ -11,6 +15,20 @@
         android:label="EmergencyResponder"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCnS9sn6KocUEotwer_AQdMKNQl9UjWD08" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_help_black_24dp" />
+        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming
+             notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+
         <activity android:name=".MainActivity"/>
         <activity android:name=".SignUp" />
         <activity android:name=".Login">
@@ -20,6 +38,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".MyFirebaseInstanceIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
