@@ -2,6 +2,7 @@ package com.owulanii.androidlogin;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.provider.Settings;
@@ -28,15 +29,20 @@ import java.net.URL;
 
 public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
     private static final String TAG = "MyFirebaseIdService";
-    private static final String TOPIC_GLOBAL = "global";
+    public static final String mypreference = "RESPONDER";
+    SharedPreferences sharedpreferences;
     JSONObject data;
-    TelephonyManager telephonyManager;
 
     @Override
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
+        sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString("token", refreshedToken);
+        editor.apply();
 
         // If you want to send messages to this application instance or
         // manage this apps subscriptions on the server side, send the
@@ -56,7 +62,7 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
     private void sendRegistrationToServer(String token) {
         // TODO: Implement this method to send token to your app server.
 
-//        submitData(token);
+        submitData(token);
     }
 
     private void submitData(String token) {
@@ -64,8 +70,9 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
         try {
             data = new JSONObject();
             data.put("token", token);
+            data.put("id", sharedpreferences.getString("id", ""));
 
-            String URL = "http://192.168.1.71:8888/emergencynearbyplaces/token.php";
+            String URL = "http://192.168.1.71:8888/php/token.php";
 
             SaveToken saveToken = new SaveToken();
             saveToken.execute(URL);

@@ -1,7 +1,9 @@
 package com.owulanii.androidlogin;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,6 +17,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +39,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
     private ProgressDialog progressDialog;
     private UserSession session;
     private UserInfo userInfo;
+    public static final String mypreference = "RESPONDER";
+    SharedPreferences sharedpreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +54,23 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
         progressDialog  = new ProgressDialog(this);
         session         = new UserSession(this);
         userInfo        = new UserInfo(this);
+
+        sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
+
+        //init firebase
+        FirebaseApp.initializeApp(this);
+
+        //get token
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(Login.this, new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String newToken = instanceIdResult.getToken();
+                Log.e("newToken", newToken);
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.putString("token", newToken);
+                editor.apply();
+            }
+        });
 
         if(session.isUserLoggedin()){
             startActivity(new Intent(this, MainActivity.class));
@@ -77,6 +102,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
                     if (!error) {
                         // Now store the user in SQLite
                         JSONObject user = jObj.getJSONObject("user");
+                        int id = user.getInt("id");
                         String uName = user.getString("username");
                         String email = user.getString("email");
 
@@ -84,6 +110,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener{
                         userInfo.setEmail(email);
                         userInfo.setUsername(uName);
                         session.setLoggedin(true);
+
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putInt("id", id);
+                        editor.apply();
 
                         startActivity(new Intent(Login.this, MainActivity.class));
                         finish();

@@ -1,7 +1,9 @@
 package com.owulanii.androidlogin;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +33,8 @@ public class SignUp extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private UserSession session;
     private UserInfo userInfo;
+    public static final String mypreference = "RESPONDER";
+    SharedPreferences sharedpreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,8 @@ public class SignUp extends AppCompatActivity {
         progressDialog  = new ProgressDialog(this);
         session         = new UserSession(this);
         userInfo        = new UserInfo(this);
+
+        sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +83,7 @@ public class SignUp extends AppCompatActivity {
                     // Check for error node in json
                     if (!error) {
                         JSONObject user = jObj.getJSONObject("user");
+                        int id = user.getInt("id");
                         String uName = user.getString("username");
                         String email = user.getString("email");
 
@@ -84,6 +91,10 @@ public class SignUp extends AppCompatActivity {
                         userInfo.setEmail(email);
                         userInfo.setUsername(uName);
                         session.setLoggedin(true);
+
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+                        editor.putInt("id", id);
+                        editor.apply();
 
                         startActivity(new Intent(SignUp.this, MainActivity.class));
                     } else {
