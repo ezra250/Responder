@@ -8,8 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -20,7 +22,9 @@ import com.android.volley.toolbox.StringRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import prefs.UserInfo;
@@ -35,6 +39,8 @@ public class SignUp extends AppCompatActivity {
     private UserInfo userInfo;
     public static final String mypreference = "RESPONDER";
     SharedPreferences sharedpreferences;
+    Spinner institution;
+    ArrayList<String> institutionArray= new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +54,26 @@ public class SignUp extends AppCompatActivity {
         progressDialog  = new ProgressDialog(this);
         session         = new UserSession(this);
         userInfo        = new UserInfo(this);
+        institution= (Spinner) findViewById(R.id.institution);
 
         sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
+
+        // Spinner Drop down elements
+        List<String> categories = new ArrayList<String>();
+        categories.add("Choose institution");
+        categories.add("hospital");
+        categories.add("Bank");
+        categories.add("police");
+        categories.add("Administrative");
+
+        // Creating adapter for spinner
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+
+        // Drop down layout style - list view with radio button
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+        institution.setAdapter(dataAdapter);
 
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,13 +81,18 @@ public class SignUp extends AppCompatActivity {
                 String uName = username.getText().toString().trim();
                 String mail  = email.getText().toString().trim();
                 String pass  = password.getText().toString().trim();
+                String inst  = institution.getSelectedItem().toString();
 
-                signup(uName, mail, pass);
+                if (inst.equals("Choose institution")){
+                    return;
+                }
+
+                signup(uName, mail, pass, inst);
             }
         });
     }
 
-    private void signup(final String username, final String email, final String password){
+    private void signup(final String username, final String email, final String password, final String inst){
         // Tag used to cancel the request
         String tag_string_req = "req_signup";
         progressDialog.setMessage("Signing up...");
@@ -126,6 +155,7 @@ public class SignUp extends AppCompatActivity {
                 params.put("username", username);
                 params.put("email", email);
                 params.put("password", password);
+                params.put("institution", inst);
 
                 return params;
             }

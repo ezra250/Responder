@@ -72,7 +72,7 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
             data.put("token", token);
             data.put("id", sharedpreferences.getString("id", ""));
 
-            String URL = "http://192.168.1.71:8888/php/token.php";
+            String URL = Utils.SAVETOKEN_URL;
 
             SaveToken saveToken = new SaveToken();
             saveToken.execute(URL);
@@ -156,7 +156,7 @@ public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
         protected void onPostExecute(String s) {
 
             if(!(exception == null)){
-                Toast.makeText(getApplicationContext(),"I am here , Try again! ", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Something went wrong , Try again! ", Toast.LENGTH_LONG).show();
 
                 Log.e(TAG, "Exception at login " + exception.getMessage());
             }else{

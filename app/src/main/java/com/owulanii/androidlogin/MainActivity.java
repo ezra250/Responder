@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         tvEmail         = (TextView)findViewById(R.id.key_email);
 
         sharedpreferences = getSharedPreferences(mypreference, Context.MODE_PRIVATE);
+        Log.d("ID###", sharedpreferences.getInt("id", 0)+"");
+        Log.d("didier", sharedpreferences.getString("token", ""));
 
         if (sharedpreferences.contains("token") && !sharedpreferences.getString("token", "").isEmpty()){
             sendRegistrationToServer(sharedpreferences.getString("token", ""));
@@ -85,13 +87,13 @@ public class MainActivity extends AppCompatActivity {
         try {
             data = new JSONObject();
             data.put("token", token);
-            data.put("id", sharedpreferences.getString("id", ""));
+            data.put("id", sharedpreferences.getInt("id", 0));
 
-            String URL = "http://192.168.1.71:8888/php/token.php";
+            String URL = Utils.SAVETOKEN_URL;
 
             SaveToken saveToken = new SaveToken();
             saveToken.execute(URL);
-            Log.d("Data", String.valueOf(data));
+            Log.d("didierData", String.valueOf(data));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -171,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
 
             if(!(exception == null)){
-                Toast.makeText(getApplicationContext(),"I am here , Try again! ", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Something went wrong , Try again! ", Toast.LENGTH_LONG).show();
 
                 Log.e(TAG, "Exception at login " + exception.getMessage());
             }else{
